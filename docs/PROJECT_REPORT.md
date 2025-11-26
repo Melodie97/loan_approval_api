@@ -40,8 +40,8 @@ Based on Feature Importance and SHAP analysis, the following features were the s
 ### Deployment Strategy
 
 - **Serialization**: The trained Random Forest model and feature list were saved as .pkl files using Python's pickle module
-- **API Development**: A web application (likely using Flask or FastAPI) was structured to load these artifacts and expose a /predict endpoint
-- **Hosting**: The application was deployed to a cloud environment using Digital Ocean droplets (virtual machines) or their App Platform for scalable hosting
+- **API Development**: A web application using FastAPI was structured to load these artifacts and expose a /predict endpoint
+- **Hosting**: The application was deployed to a cloud environment using Digital Ocean App Platform.
 
 ### Challenges Faced
 
