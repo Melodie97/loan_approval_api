@@ -218,8 +218,8 @@ class LoanApprovalInferencePipeline:
 if __name__ == "__main__":
     # Initialize pipeline with feature names
     pipeline = LoanApprovalInferencePipeline(
-        r'/Users/melodie.ezeani/Documents/loan_api_project/model/best_rf.pkl',
-        r'/Users/melodie.ezeani/Documents/loan_api_project/model/feature_names.pkl'
+        r'model/best_rf.pkl',
+        r'model/feature_names.pkl'
     )
     
     # Example input
