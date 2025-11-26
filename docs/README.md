@@ -15,22 +15,26 @@ A machine learning-powered REST API that predicts loan approval decisions using 
 
 ```
 loan_api_project/
-├── app.py                    # FastAPI application
+├── app.py
 ├── jupyter_notebooks/
 │   └── Data Cleaning & EDA.ipynb
 │   └──Feature_Engineering.ipynb
 │   └── Modelling.ipynb
 ├── modules/
-│   └── inference_pipeline.py # ML preprocessing and prediction pipeline
+│   └── inference_pipeline.py
 ├── model/
-│   ├── best_rf.pkl          # Trained Random Forest model
-│   └── feature_names.pkl    # Feature alignment for inference
+│   ├── best_rf.pkl model
+│   └── feature_names.pkl
 ├── static/
-│   └── index.html           # Web interface
-├── data/                    # Training/test datasets
-├── requirements.txt         # Python dependencies
-├── Dockerfile              # Container configuration
-└── README.md               # This file
+│   └── index.html
+├── data/
+├── docs/
+│   └── README.md
+│   └── PROJECT_REPORT.md
+│   └── local test screenshot
+├── requirements.txt
+├── runtime.txt
+└── README.md
 ```
 
 ## Quick Start
@@ -50,17 +54,10 @@ python app.py
 ```
 
 3. **Access the application**:
-- Web Interface: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-- Health Check: http://localhost:8000/health
+- Web Interface: https://seashell-app-gqs22.ondigitalocean.app/
+- API Documentation: https://seashell-app-gqs22.ondigitalocean.app/docs
 
-### Docker Deployment
 
-1. **Build and run**:
-```bash
-docker build -t loan-api .
-docker run -p 8000:8000 loan-api
-```
 
 ## API Usage
 
@@ -136,14 +133,7 @@ docker run -p 8000:8000 loan-api
 2. Update feature engineering in `create_advanced_features()`
 3. Retrain model and update `model/` files
 
-### Testing
 
-```bash
-# Test prediction endpoint
-curl -X POST "http://localhost:8000/predict" \
-  -H "Content-Type: application/json" \
-  -d @sample_request.json
-```
 
 ### Logging
 
@@ -157,7 +147,7 @@ Log levels: INFO (default), DEBUG (detailed processing)
 
 ### Environment Variables
 
-- `PORT`: Server port (default: 8000)
+- `PORT`: Server port (default: 8080)
 - `HOST`: Server host (default: 0.0.0.0)
 
 ### Production Considerations
