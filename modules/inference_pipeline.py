@@ -2,18 +2,23 @@ import pandas as pd
 import numpy as np
 import joblib
 import pickle
+import logging
 from typing import Dict, List, Any
 
 class LoanApprovalInferencePipeline:
     def __init__(self, model_path: str, feature_names_path: str = None):
         """Initialize the inference pipeline with trained model"""
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(f"Loading model from {model_path}")
         self.model = joblib.load(model_path)
         
         if feature_names_path:
             with open(feature_names_path, 'rb') as f:
                 self.expected_features = pickle.load(f)
+            self.logger.info(f"Loaded {len(self.expected_features)} expected features")
         else:
             self.expected_features = None
+            self.logger.warning("No feature names file provided")
         self.payload_cols = ['id', 'address_state', 'application_type', 'emp_length', 'emp_title',
                            'grade', 'home_ownership', 'issue_date', 'last_credit_pull_date',
                            'last_payment_date','next_payment_date', 'member_id',
@@ -184,35 +189,53 @@ class LoanApprovalInferencePipeline:
     
     def predict(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """Main prediction function"""
-        # Convert input to DataFrame
-        df = pd.DataFrame([input_data])
+        self.logger.info("Starting prediction process")
         
-        # Apply preprocessing pipeline
-        df = self.preprocess_data(df)
-        df = self.create_advanced_features(df)
-        df = self.clean_features(df)
-        
-        # Align features with training data
-        if self.expected_features is not None:
-            # Add missing columns with 0s
-            for col in self.expected_features:
-                if col not in df.columns:
-                    df[col] = 0
+        try:
+            # Convert input to DataFrame
+            df = pd.DataFrame([input_data])
+            self.logger.debug(f"Input data shape: {df.shape}")
             
-            # Reorder columns to match training
-            df = df[self.expected_features]
-        
-        # Make prediction
-        prediction = self.model.predict(df)[0]
-        probability = self.model.predict_proba(df)[0]
-        
-        return {
-            'prediction': int(prediction),
-            'probability_good_loan': float(probability[0]),
-            'probability_bad_loan': float(probability[1]),
-            'loan_decision': 'APPROVED' if prediction == 0 else 'REJECTED',
-            'risk_level': 'High' if probability[1] > 0.7 else 'Medium' if probability[1] > 0.3 else 'Low'
-        }
+            # Apply preprocessing pipeline
+            df = self.preprocess_data(df)
+            self.logger.debug(f"After preprocessing: {df.shape}")
+            
+            df = self.create_advanced_features(df)
+            self.logger.debug(f"After feature creation: {df.shape}")
+            
+            df = self.clean_features(df)
+            self.logger.debug(f"After cleaning: {df.shape}")
+            
+            # Align features with training data
+            if self.expected_features is not None:
+                missing_cols = [col for col in self.expected_features if col not in df.columns]
+                if missing_cols:
+                    self.logger.debug(f"Adding {len(missing_cols)} missing columns")
+                    for col in missing_cols:
+                        df[col] = 0
+                
+                # Reorder columns to match training
+                df = df[self.expected_features]
+                self.logger.debug(f"Final feature alignment complete: {df.shape}")
+            
+            # Make prediction
+            prediction = self.model.predict(df)[0]
+            probability = self.model.predict_proba(df)[0]
+            
+            result = {
+                'prediction': int(prediction),
+                'probability_good_loan': float(probability[0]),
+                'probability_bad_loan': float(probability[1]),
+                'loan_decision': 'APPROVED' if prediction == 0 else 'REJECTED',
+                'risk_level': 'High' if probability[1] > 0.7 else 'Medium' if probability[1] > 0.3 else 'Low'
+            }
+            
+            self.logger.info(f"Prediction successful: {result['loan_decision']} (risk: {result['risk_level']})")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Prediction failed: {str(e)}")
+            raise
 
 # Usage example
 if __name__ == "__main__":
