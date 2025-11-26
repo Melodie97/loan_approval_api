@@ -7,6 +7,7 @@ from modules.inference_pipeline import LoanApprovalInferencePipeline
 import uvicorn
 import logging
 import time
+import os
 from datetime import datetime
 
 # Configure logging
@@ -115,5 +116,6 @@ def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 if __name__ == "__main__":
-    logger.info("Starting Loan Approval API server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    port = int(os.getenv("PORT", 8080))
+    logger.info(f"Starting Loan Approval API server on port {port}...")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
